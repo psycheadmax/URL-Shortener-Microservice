@@ -1,4 +1,3 @@
-// import UrlModel, findOrCreate, create from "./mongoFunc.js";
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
@@ -23,35 +22,41 @@ app.get('/api/hello', function(req, res) {
   res.json({ greeting: 'hello API' });
 });
 
-// TODO body parsing middleware to handle POST req - OK
-// TODO dns.lookup(host, cb) - OK
-// TODO store in db
-// TODO move mongo functions to another file - OK
-// TODO rewrite w/o mongo
+const randomId = () => Math.floor(Math.random()*1000)
+const id = randomId()
+let urlToLookup
 
-  // TODO plan
-  // find if exists
-  // create if not
-  // num. should generate or not???
-
-// TODO random id or unique id from db
-// TODO display path
+function urlCorrector(url) {
+  url = url.replace(/(http\:\/\/)|(https\:\/\/)/, '') // remove http://
+  // const regex = /^(((http\:\/\/)|(https\:\/\/)){0,1}[a-zA-z0-9])([-a-zA-Z0-9.]*)\.([a-zA-Z]{2,})$/ // with looking for http
+  const regex = /^([a-zA-z0-9])([-a-zA-Z0-9.]*)\.([a-zA-Z]{2,})$/
+  if (regex.test(url)) {
+    urlToLookup = url
+    return urlToLookup
+  } else {
+    return false
+  }
+}
 
 app.post('/api/shorturl', function(req, res) {
-  const urlToLookup = req.body.url
-  dns.lookup(urlToLookup, (err) => {
-    if (err) {
-      console.log(err)
-      res.json({'name': 'invalid url'})
-    }
-  })
-  require('./mongoFunc.js').findOrCreate(urlToLookup)
-  // create(urlToLookup)
-  res.json({'name': urlToLookup}) // the answer is: {"name":{"url":"vkfb.ru"}}
+  urlToLookup = req.body.url
+  if (urlCorrector(urlToLookup)) {
+    dns.lookup(urlToLookup, (err) => {
+      if (err) {
+        res.json({'name': 'invalid url'})
+      } else {
+        res.json({
+          "original_url": urlToLookup,
+          "short_url": id
+        })
+      }
+    })
+  }
 });
 
-// TODO example answer is:
-// {"original_url":"https://vk.com","short_url":226}
+app.get('/api/shorturl/'+id, function(req, res) {
+  res.redirect(301, 'http://' + urlToLookup)
+});
 
 app.listen(port, function() {
   console.log(`Listening on port ${port}`);

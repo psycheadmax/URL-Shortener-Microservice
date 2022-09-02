@@ -12,9 +12,7 @@
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
-    "dns": "^0.2.2",
-    "mongoose": "^6.5.3",
-    "mongodb": "^4.9.0"
+    "dns": "^0.2.2"
   },
   "license": "MIT",
   "devDependencies": {
