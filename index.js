@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
@@ -43,11 +44,11 @@ app.post('/api/shorturl', function(req, res) {
   if (urlCorrector(urlToLookup)) {
     dns.lookup(urlToLookup, (err) => {
       if (err) {
-        res.json({'name': 'invalid url'})
+        res.json({name: 'invalid url'})
       } else {
         res.json({
-          "original_url": urlToLookup,
-          "short_url": id
+          original_url: 'http://' + urlToLookup,
+          short_url: id
         })
       }
     })
